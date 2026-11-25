@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAC8UlEQVR42u3dsVEbURSGUfRGoQMCnDizI0I3QEwfbsEBIePQgVtwH47dAKEzCiAhoAAa8GhWEu/ef9nzFcC7oz1z34hAu7v69OVC+l/DRyA4BIfgEByCQ3AIDsEhOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQ3AIDsEhOASH3lv7xrMfbj7UHPT178uMP/v467lm/s/fL1se0K7+JxjKTExSUmaiXcnYjow3Ob1RRv3pdZujl8X5K6SXRcsKGRuUccI8UTLK5hkblHHsVGkyyqbyVVZ9ODLXxvLZMtdGzWxjszKWTJgso2BC14rgUBSO/Dvl8Jz5d8rsOW0OwSE4BIfgEByCQ3AIDsEhOCQ4BIfgEByCQ3AIDsEhOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQyvBMeldBWVzdr2r4NjmzWlzCA6l4ci/WQ5PmH+zTJ1w9H76yTLyfcyezbWiVhyZy2P5VJnLo2CqkfYkMudJ81EzT/ULANt/8/pMpu2/eV3JdKzr2bSf3rtCik9veHVo/RbxXtn14ZBvK4JDcAgOCQ7BoRPaN5798eePmoOe7u5n/Nnbb/9q5v/z+7rlATX8n6PMxCQlZSbalYztyHiT0xtl1J9etzl6WZy/QnpZtKyQsUEZJ8wTJaNsnrFBGcdOlSajbCpfZdWHI3NtLJ8tc23UzDY2K2PJhMkyCiZ0rQgOReHIv1MOz5l/p8ye0+YQHIJDcAgOwSE4BIfgEByCQ4JDcAgOwSE4BIfgEByCQ3BIcAgOwSE4BIfgEByCQ3AIDgkOwSE4tBIck95VUDZn17sKjm3enDaH4FAajvyb5fCE+TfL1AlH76efLCPfx+zZXCtqxZG5PJZPlbk8CqYaaU8ic540HzXzVL8AsP03r89k2v6b15VMx7qeTfvpvSuk+PSGV4fWbxHvlV0fDvm2IjgEh+CQ4BAcgkNwCA7BITgEh+AQHIJDgkNwCA7BITgEh+AQHIJDcEhwCA7BoSm9AmlR0NJh8dEsAAAAAElFTkSuQmCC">
+<meta name="apple-mobile-web-app-title" content="Блоки">
+<title>Блоки</title>
+<style>
+:root{--bg:#eef2f5;--fg:#1c2430;--cell:#d9e1e8;--panel:#e3e9ee;--w:min(92vw,50vh,520px);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a22;--fg:#e8edf2;--cell:#222c38;--panel:#1a222c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141a22;--fg:#e8edf2;--cell:#222c38;--panel:#1a222c;color-scheme:dark}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:var(--bg);color:var(--fg);touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;font-family:ui-rounded,"SF Pro Rounded",system-ui,sans-serif}
+header{width:var(--w);display:flex;justify-content:space-between;align-items:flex-end}
+header div{display:flex;flex-direction:column}
+header small{font-size:15px;opacity:.65}
+header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-variant-numeric:tabular-nums}
+#best{opacity:.7}
+#board{width:var(--w);aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);background:var(--panel);border-radius:14px}
+.c,.b{border:2px solid transparent;background-clip:padding-box;border-radius:28%}
+.c{background-color:var(--cell)}
+.c.clr{animation:clr .3s forwards}
+@keyframes clr{40%{transform:scale(1.15);filter:brightness(1.8)}100%{transform:scale(0);opacity:0}}
+.shake{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+#tray{width:var(--w);display:flex;justify-content:space-around}
+.slot{width:33%;min-height:130px;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.slot.hl{outline:3px solid #f3a712}
+.pc{display:grid}
+.ghost{position:fixed;pointer-events:none;z-index:9;filter:drop-shadow(0 8px 10px rgba(0,0,0,.3))}
+#bar{width:var(--w);display:flex;gap:8px}
+#bar button{flex:1;font:inherit;font-size:14px;padding:10px 4px;border:0;border-radius:10px;background:var(--panel);color:var(--fg)}
+#bar button.off{opacity:.4}
+#pop{position:fixed;left:0;right:0;top:30%;text-align:center;font-size:clamp(28px,5vh,44px);font-weight:800;color:#f3a712;text-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none;z-index:15;opacity:0}
+#pop.go{animation:pp 1s}
+@keyframes pp{0%{opacity:1;transform:translateY(20px)}70%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
+.ov{position:fixed;inset:0;background:rgba(10,14,20,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;z-index:20;padding:20px;text-align:center}
+.ov h2{margin:0;font-size:36px}
+.ov p{margin:0;font-size:17px;opacity:.85;min-height:22px}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.row button{font:inherit;font-size:18px;padding:11px 16px;border:2px solid rgba(255,255,255,.35);border-radius:12px;background:transparent;color:#fff}
+.row button.on{background:#f3a712;color:#1c2430;border-color:#f3a712}
+.go2{font:inherit;font-size:21px;font-weight:700;padding:14px 34px;border:0;border-radius:14px;background:#f3a712;color:#1c2430}
+.ov small{opacity:.6;font-size:15px}
+</style></head><body>
+<header><div><small>Рахунок</small><b id="score">0</b></div><div id="tbox" hidden style="align-items:center"><small>Час</small><b id="time">60</b></div><div style="align-items:flex-end"><small>Рекорд</small><b id="best">0</b></div></header>
+<div id="board"></div>
+<div id="tray"></div>
+<div id="bar"><button id="hint"></button><button id="undo"></button><button id="theme"></button><button id="snd">Звук: так</button><button id="menuBtn">Меню</button></div>
+<div id="pop"></div>
+<div id="menu" class="ov"><h2>Блоки</h2>
+<small>Складність</small><div class="row" id="dsel"><button data-v="easy">Легко</button><button data-v="normal">Нормально</button><button data-v="hard">Складно</button></div><p id="dinfo"></p>
+<small>Режим</small><div class="row" id="msel"><button data-v="classic">Класичний</button><button data-v="timed">На час</button><button data-v="stones">З перешкодами</button></div><p id="minfo"></p>
+<button id="play" class="go2">Грати</button></div>
+<div id="over" class="ov" hidden><h2 id="otitle">Гра закінчилась</h2><p>Рахунок: <span id="final">0</span></p><button id="again" class="go2">Грати ще раз</button><button id="tomenu" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Меню</button></div>
+<script>
+const N=8,STONE='#7b8794';
+const TH=[{n:'Захід',c:['#e4572e','#f3a712','#29a3a3','#5b7cfa','#b05bd1']},{n:'Океан',c:['#0ea5a4','#38bdf8','#6366f1','#34d399','#f0abfc']},{n:'Неон',c:['#ff2e93','#ffe600','#00f5d4','#9b5cff','#ff7a00']}];
+const DF={easy:{h:5,cost:10,u:3,w:n=>Math.max(1,7-n)},normal:{h:3,cost:20,u:2,w:()=>1},hard:{h:2,cost:30,u:1,w:n=>n}};
+const MI={classic:'Грай без обмежень, поки є ходи.',timed:'60 секунд, набери якомога більше.',stones:'На полі 10 каменів, вони зникають разом з лініями.'};
+const SH=[[[1]],[[1,1]],[[1],[1]],[[1,1,1]],[[1],[1],[1]],[[1,1,1,1]],[[1],[1],[1],[1]],[[1,1],[1,1]],[[1,1,1],[1,1,1],[1,1,1]],[[1,0],[1,1]],[[0,1],[1,1]],[[1,1],[1,0]],[[1,1],[0,1]],[[1,0,0],[1,0,0],[1,1,1]],[[1,1,1],[1,0,0]],[[1,1,1],[0,1,0]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
+const $=id=>document.getElementById(id),bd=$('board'),tr=$('tray'),cells=[],rnd=n=>Math.random()*n|0;
+let cfg={d:'normal',m:'classic'},th=0,g,tray,score=0,best=0,combo=0,snap=null,hl=0,ul=0,time=60,tm,ht,drag=null,playing=false,lock=false,mute=false,AC;
+try{th=+localStorage.getItem('blk-th')||0}catch(e){}
+for(let i=0;i<N*N;i++){const d=document.createElement('div');d.className='c';bd.appendChild(d);cells.push(d)}
+const col=v=>v===6?STONE:TH[th].c[v-1];
+/* звук */
+addEventListener('pointerdown',()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}});
+function tone(f,d=.1,t='sine',v=.15,dl=0){if(mute||!AC)return;try{const o=AC.createOscillator(),gn=AC.createGain(),s=AC.currentTime+dl;o.type=t;o.frequency.value=f;gn.gain.setValueAtTime(v,s);gn.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(gn);gn.connect(AC.destination);o.start(s);o.stop(s+d)}catch(e){}}
+function shake(){bd.classList.remove('shake');void bd.offsetWidth;bd.classList.add('shake');try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}}
+function pop(t){const p=$('pop');p.textContent=t;p.classList.remove('go');void p.offsetWidth;p.classList.add('go')}
+/* фігури */
+function pick(){const w=SH.map(s=>DF[cfg.d].w(s.flat().reduce((a,b)=>a+b,0)));let r=Math.random()*w.reduce((a,b)=>a+b,0),i=0;while(i<SH.length-1&&(r-=w[i])>0)i++;return{s:SH[i],c:rnd(5)}}
+function fill(){tray=[pick(),pick(),pick()]}
+function mk(p,sz,stone){const e=document.createElement('div');e.className='pc';e.style.gridTemplateColumns=`repeat(${p.s[0].length},${sz}px)`;e.style.gridAutoRows=sz+'px';p.s.forEach(row=>row.forEach(v=>{const d=document.createElement('div');if(v){d.className='b';d.style.backgroundColor=col(p.c+1)}e.appendChild(d)}));return e}
+/* малювання */
+function drawBoard(pv){cells.forEach((d,k)=>{const v=g[k/N|0][k%N];d.className='c';d.style.backgroundColor=v?col(v):'';d.style.opacity=''});
+if(pv)pv.set.forEach(k=>{const d=cells[k];d.style.backgroundColor=pv.ok?pv.c:'#e4572e';d.style.opacity=pv.ok?.5:.35})}
+function drawTray(hi){tr.innerHTML='';tray.forEach((p,i)=>{const s=document.createElement('div');s.className='slot'+(i===hi?' hl':'');if(p){const m=mk(p,30);m.dataset.i=i;m.style.touchAction='none';m.addEventListener('pointerdown',down);s.appendChild(m)}tr.appendChild(s)})}
+function drawHud(){const D=DF[cfg.d];$('score').textContent=score;$('best').textContent=best;$('time').textContent=time;
+$('hint').textContent=`Підказка −${D.cost} (${hl})`;$('hint').classList.toggle('off',hl<=0||score<D.cost);
+$('undo').textContent=`Назад (${ul})`;$('undo').classList.toggle('off',ul<=0||!snap);
+$('theme').textContent=TH[th].n;$('snd').textContent=mute?'Звук: ні':'Звук: так'}
+/* логіка */
+function fits(p,r0,c0){return p.s.every((row,i)=>row.every((v,j)=>{if(!v)return true;const r=r0+i,c=c0+j;return r>=0&&c>=0&&r<N&&c<N&&!g[r][c]}))}
+function anyFit(p){for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fits(p,r,c))return true;return false}
+function sim(p,r0,c0){const t=g.map(r=>r.slice());p.s.forEach((row,i)=>row.forEach((v,j)=>{if(v)t[r0+i][c0+j]=1}));let L=0;for(let k=0;k<N;k++){if(t[k].every(Boolean))L++;if(t.every(r=>r[k]))L++}return L}
+function keys(p,t){const s=new Set();p.s.forEach((row,i)=>row.forEach((v,j)=>{const r=t.r+i,c=t.c+j;if(v&&r>=0&&c>=0&&r<N&&c<N)s.add(r*N+c)}));return s}
+function down(e){if(lock||!playing)return;e.preventDefault();clearTimeout(ht);const i=+e.currentTarget.dataset.i,p=tray[i],cs=bd.getBoundingClientRect().width/N,gh=mk(p,cs);gh.classList.add('ghost');document.body.appendChild(gh);drag={i,p,gh,cs};e.currentTarget.style.opacity=.25;move(e);addEventListener('pointermove',move);addEventListener('pointerup',up);addEventListener('pointercancel',cancel)}
+function move(e){const r=bd.getBoundingClientRect(),{gh,cs,p}=drag,x=e.clientX-p.s[0].length*cs/2,y=e.clientY-p.s.length*cs-48;gh.style.left=x+'px';gh.style.top=y+'px';
+const t={c:Math.round((x-r.left)/cs),r:Math.round((y-r.top)/cs)};drag.t=t;drawBoard({set:keys(p,t),ok:fits(p,t.r,t.c),c:col(p.c+1)})}
+function cleanup(){removeEventListener('pointermove',move);removeEventListener('pointerup',up);removeEventListener('pointercancel',cancel);drag.gh.remove();const d=drag;drag=null;return d}
+function cancel(){cleanup();drawBoard();drawTray()}
+function up(){const d=cleanup();if(d.t&&fits(d.p,d.t.r,d.t.c))place(d);else{tone(140,.15,'sawtooth',.1);shake();drawBoard();drawTray()}}
+function place(d){const{p,t}=d;snap={g:g.map(r=>r.slice()),tray:tray.slice(),score,combo};
+let n=0;p.s.forEach((row,i)=>row.forEach((v,j)=>{if(v){g[t.r+i][t.c+j]=p.c+1;n++}}));
+const rows=[],cols=[];for(let k=0;k<N;k++){if(g[k].every(Boolean))rows.push(k);if(g.every(r=>r[k]))cols.push(k)}
+const L=rows.length+cols.length;combo=L?combo+1:0;const mult=L?Math.min(combo,5):1,pts=(n+L*10*L)*mult;score+=pts;
+tray[d.i]=null;if(tray.every(x=>!x))fill();
+if(score>best){best=score;try{localStorage.setItem('blk-'+cfg.m+cfg.d,best)}catch(e){}}
+drawBoard();drawTray();drawHud();
+if(!L){tone(300,.08,'triangle');return check()}
+lock=true;const ks=new Set();rows.forEach(r=>{for(let c=0;c<N;c++)ks.add(r*N+c)});cols.forEach(c=>{for(let r=0;r<N;r++)ks.add(r*N+c)});
+ks.forEach(k=>cells[k].classList.add('clr'));
+for(let i=0;i<2+Math.min(L,3);i++)tone([523,659,784,1047,1319][i]*(1+(mult-1)*.06),.18,'sine',.16,i*.07);
+if(L>1)shake();pop(`+${pts}`+(mult>1?`  Комбо ×${mult}`:''));
+setTimeout(()=>{ks.forEach(k=>g[k/N|0][k%N]=0);lock=false;drawBoard();check()},320)}
+function check(){if(playing&&!tray.some(x=>x&&anyFit(x)))over('Немає ходів')}
+function over(t){playing=false;clearInterval(tm);tone(400,.25,'triangle',.15);tone(300,.25,'triangle',.15,.2);tone(200,.4,'triangle',.15,.4);$('otitle').textContent=t;$('final').textContent=score;$('over').hidden=false}
+function hint(){if(lock||!playing||drag)return;const D=DF[cfg.d];if(hl<=0||score<D.cost){shake();tone(140,.15,'sawtooth',.1);return}
+let b=null;tray.forEach((p,i)=>{if(!p)return;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fits(p,r,c)){const L=sim(p,r,c);if(!b||L>b.L)b={p,i,t:{r,c},L}}});
+if(!b)return;score-=D.cost;hl--;drawHud();drawBoard({set:keys(b.p,b.t),ok:true,c:col(b.p.c+1)});drawTray(b.i);tone(880,.12,'sine',.12);
+clearTimeout(ht);ht=setTimeout(()=>{if(!drag){drawBoard();drawTray()}},2800)}
+function undo(){if(lock||!playing||drag||!snap||ul<=0)return;({g,tray,score,combo}=snap);snap=null;ul--;clearTimeout(ht);drawBoard();drawTray();drawHud();tone(440,.1,'triangle')}
+function start(){const D=DF[cfg.d];g=Array.from({length:N},()=>Array(N).fill(0));score=0;combo=0;snap=null;hl=D.h;ul=D.u;playing=true;lock=false;time=60;
+try{best=+localStorage.getItem('blk-'+cfg.m+cfg.d)||0}catch(e){best=0}
+if(cfg.m==='stones'){let k=0;while(k<10){const r=rnd(N),c=rnd(N);if(!g[r][c]){g[r][c]=6;k++}}}
+fill();clearInterval(tm);$('tbox').hidden=cfg.m!=='timed';
+if(cfg.m==='timed')tm=setInterval(()=>{time--;drawHud();if(time<=0)over('Час вийшов')},1000);
+$('menu').hidden=true;$('over').hidden=true;drawBoard();drawTray();drawHud()}
+/* меню */
+function menu(){clearInterval(tm);playing=false;['dsel','msel'].forEach(id=>[...$(id).children].forEach(b=>b.classList.toggle('on',b.dataset.v===cfg[id[0]])));
+const D=DF[cfg.d];$('dinfo').textContent=`Підказок: ${D.h} (по ${D.cost} очок), скасувань ходу: ${D.u}`;$('minfo').textContent=MI[cfg.m];$('over').hidden=true;$('menu').hidden=false}
+['dsel','msel'].forEach(id=>$(id).addEventListener('click',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v){cfg[id[0]]=v;menu()}}));
+$('play').onclick=start;$('again').onclick=start;$('tomenu').onclick=menu;$('menuBtn').onclick=menu;
+$('hint').onclick=hint;$('undo').onclick=undo;
+$('theme').onclick=()=>{th=(th+1)%TH.length;try{localStorage.setItem('blk-th',th)}catch(e){}if(drag)return;drawBoard();drawTray();drawHud()};
+$('snd').onclick=()=>{mute=!mute;drawHud()};
+g=Array.from({length:N},()=>Array(N).fill(0));tray=[];drawBoard();drawHud();menu();
+</script></body></html>
