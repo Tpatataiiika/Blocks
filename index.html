@@ -35,7 +35,7 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 #pop{position:fixed;left:0;right:0;top:30%;text-align:center;font-size:clamp(28px,5vh,44px);font-weight:800;color:#f3a712;text-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none;z-index:15;opacity:0}
 #pop.go{animation:pp 1s}
 @keyframes pp{0%{opacity:1;transform:translateY(20px)}70%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
-.ov{position:fixed;inset:0;background:rgba(10,14,20,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;z-index:20;padding:20px;text-align:center}
+.ov{position:fixed;inset:0;background:rgba(10,14,20,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;z-index:20;padding:20px;text-align:center;overflow:auto}
 .ov h2{margin:0;font-size:36px}
 .ov p{margin:0;font-size:17px;opacity:.85;min-height:22px}
 .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -43,24 +43,32 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 .row button.on{background:#f3a712;color:#1c2430;border-color:#f3a712}
 .go2{font:inherit;font-size:21px;font-weight:700;padding:14px 34px;border:0;border-radius:14px;background:#f3a712;color:#1c2430}
 .ov small{opacity:.6;font-size:15px}
+.ov input{font:inherit;font-size:19px;padding:11px;border-radius:12px;border:2px solid rgba(255,255,255,.35);background:transparent;color:#fff;width:160px;text-align:center;-webkit-user-select:text;user-select:text}
+#lbl{min-width:270px;font-size:19px}
+#lbl div{display:flex;justify-content:space-between;gap:20px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.15)}
 </style></head><body>
-<header><div><small>Рахунок</small><b id="score">0</b></div><div id="tbox" hidden style="align-items:center"><small>Час</small><b id="time">60</b></div><div style="align-items:flex-end"><small>Рекорд</small><b id="best">0</b></div></header>
+<header><div><small>Рахунок</small><b id="score">0</b></div><div id="tbox" hidden style="align-items:center"><small>Час</small><b id="time">60</b><small id="opp"></small></div><div style="align-items:flex-end"><small>Рекорд</small><b id="best">0</b></div></header>
 <div id="board"></div>
 <div id="tray"></div>
 <div id="bar"><button id="hint"></button><button id="undo"></button><button id="theme"></button><button id="snd">Звук: так</button><button id="menuBtn">Меню</button></div>
 <div id="pop"></div>
-<div id="menu" class="ov"><h2>Блоки</h2>
+<div id="menu" class="ov"><h2>Блоки</h2><input id="nm" maxlength="12" placeholder="Твоє ім’я">
 <small>Складність</small><div class="row" id="dsel"><button data-v="easy">Легко</button><button data-v="normal">Нормально</button><button data-v="hard">Складно</button></div><p id="dinfo"></p>
 <small>Режим</small><div class="row" id="msel"><button data-v="classic">Класичний</button><button data-v="timed">На час</button><button data-v="stones">З перешкодами</button></div><p id="minfo"></p>
-<button id="play" class="go2">Грати</button></div>
-<div id="over" class="ov" hidden><h2 id="otitle">Гра закінчилась</h2><p>Рахунок: <span id="final">0</span></p><button id="again" class="go2">Грати ще раз</button><button id="tomenu" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Меню</button></div>
+<button id="play" class="go2">Грати</button><div class="row"><button id="lbBtn">Таблиця рекордів</button><button id="duelBtn">Онлайн дуель</button></div></div>
+<div id="over" class="ov" hidden><h2 id="otitle">Гра закінчилась</h2><p>Рахунок: <span id="final">0</span></p><button id="again" class="go2">Грати ще раз</button><button id="lb2" class="go2" hidden>Рекорди</button><button id="tomenu" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Меню</button></div>
+<div id="duel" class="ov" hidden><h2>Онлайн дуель</h2><p>60 секунд, у обох однакові фігури. Перемагає той, хто набере більше очок.</p><button id="mk" class="go2">Створити кімнату</button><div class="row"><input id="code" inputmode="numeric" maxlength="4" placeholder="Код кімнати"><button id="jn">Увійти</button></div><p id="dmsg"></p><button id="dx" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Назад</button></div>
+<div id="lb" class="ov" hidden><h2>Рекорди: на час</h2><div class="row" id="lbt"><button data-v="easy">Легко</button><button data-v="normal">Нормально</button><button data-v="hard">Складно</button></div><div id="lbl"></div><button id="lbx" class="go2">Закрити</button></div>
 <script>
+/* Адреса бази Firebase для рекордів і дуелі. Встав її між лапками, наприклад https://назва-default-rtdb.firebaseio.com */
+const DBU='';
+let R=Math.random;
 const N=8,STONE='#7b8794';
 const TH=[{n:'Захід',c:['#e4572e','#f3a712','#29a3a3','#5b7cfa','#b05bd1']},{n:'Океан',c:['#0ea5a4','#38bdf8','#6366f1','#34d399','#f0abfc']},{n:'Неон',c:['#ff2e93','#ffe600','#00f5d4','#9b5cff','#ff7a00']}];
 const DF={easy:{h:5,cost:10,u:3,w:n=>Math.max(1,7-n)},normal:{h:3,cost:20,u:2,w:()=>1},hard:{h:2,cost:30,u:1,w:n=>n}};
 const MI={classic:'Грай без обмежень, поки є ходи.',timed:'60 секунд, набери якомога більше.',stones:'На полі 10 каменів, вони зникають разом з лініями.'};
 const SH=[[[1]],[[1,1]],[[1],[1]],[[1,1,1]],[[1],[1],[1]],[[1,1,1,1]],[[1],[1],[1],[1]],[[1,1],[1,1]],[[1,1,1],[1,1,1],[1,1,1]],[[1,0],[1,1]],[[0,1],[1,1]],[[1,1],[1,0]],[[1,1],[0,1]],[[1,0,0],[1,0,0],[1,1,1]],[[1,1,1],[1,0,0]],[[1,1,1],[0,1,0]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
-const $=id=>document.getElementById(id),bd=$('board'),tr=$('tray'),cells=[],rnd=n=>Math.random()*n|0;
+const $=id=>document.getElementById(id),bd=$('board'),tr=$('tray'),cells=[],rnd=n=>R()*n|0;
 let cfg={d:'normal',m:'classic'},th=0,g,tray,score=0,best=0,combo=0,snap=null,hl=0,ul=0,time=60,tm,ht,drag=null,playing=false,lock=false,mute=false,AC;
 try{th=+localStorage.getItem('blk-th')||0}catch(e){}
 for(let i=0;i<N*N;i++){const d=document.createElement('div');d.className='c';bd.appendChild(d);cells.push(d)}
@@ -71,7 +79,7 @@ function tone(f,d=.1,t='sine',v=.15,dl=0){if(mute||!AC)return;try{const o=AC.cre
 function shake(){bd.classList.remove('shake');void bd.offsetWidth;bd.classList.add('shake');try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}}
 function pop(t){const p=$('pop');p.textContent=t;p.classList.remove('go');void p.offsetWidth;p.classList.add('go')}
 /* фігури */
-function pick(){const w=SH.map(s=>DF[cfg.d].w(s.flat().reduce((a,b)=>a+b,0)));let r=Math.random()*w.reduce((a,b)=>a+b,0),i=0;while(i<SH.length-1&&(r-=w[i])>0)i++;return{s:SH[i],c:rnd(5)}}
+function pick(){const w=SH.map(s=>DF[cfg.d].w(s.flat().reduce((a,b)=>a+b,0)));let r=R()*w.reduce((a,b)=>a+b,0),i=0;while(i<SH.length-1&&(r-=w[i])>0)i++;return{s:SH[i],c:rnd(5)}}
 function fill(){tray=[pick(),pick(),pick()]}
 function mk(p,sz,stone){const e=document.createElement('div');e.className='pc';e.style.gridTemplateColumns=`repeat(${p.s[0].length},${sz}px)`;e.style.gridAutoRows=sz+'px';p.s.forEach(row=>row.forEach(v=>{const d=document.createElement('div');if(v){d.className='b';d.style.backgroundColor=col(p.c+1)}e.appendChild(d)}));return e}
 /* малювання */
@@ -107,7 +115,7 @@ for(let i=0;i<2+Math.min(L,3);i++)tone([523,659,784,1047,1319][i]*(1+(mult-1)*.0
 if(L>1)shake();pop(`+${pts}`+(mult>1?`  Комбо ×${mult}`:''));
 setTimeout(()=>{ks.forEach(k=>g[k/N|0][k%N]=0);lock=false;drawBoard();check()},320)}
 function check(){if(playing&&!tray.some(x=>x&&anyFit(x)))over('Немає ходів')}
-function over(t){playing=false;clearInterval(tm);tone(400,.25,'triangle',.15);tone(300,.25,'triangle',.15,.2);tone(200,.4,'triangle',.15,.4);$('otitle').textContent=t;$('final').textContent=score;$('over').hidden=false}
+function over(t){playing=false;clearInterval(tm);tone(400,.25,'triangle',.15);tone(300,.25,'triangle',.15,.2);tone(200,.4,'triangle',.15,.4);$('otitle').textContent=t;$('final').textContent=score;$('over').hidden=false;$('lb2').hidden=cfg.m!=='timed';if(cfg.m==='timed')submit();if(cfg.m==='duel'&&room){room.fin=1;$('otitle').textContent='Чекаємо суперника…';api('rooms/'+room.code+'/'+room.role,'PUT',{n:nm(),s:score,done:1}).catch(()=>{});setTimeout(endDuel,70000)}}
 function hint(){if(lock||!playing||drag)return;const D=DF[cfg.d];if(hl<=0||score<D.cost){shake();tone(140,.15,'sawtooth',.1);return}
 let b=null;tray.forEach((p,i)=>{if(!p)return;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fits(p,r,c)){const L=sim(p,r,c);if(!b||L>b.L)b={p,i,t:{r,c},L}}});
 if(!b)return;score-=D.cost;hl--;drawHud();drawBoard({set:keys(b.p,b.t),ok:true,c:col(b.p.c+1)});drawTray(b.i);tone(880,.12,'sine',.12);
@@ -116,16 +124,48 @@ function undo(){if(lock||!playing||drag||!snap||ul<=0)return;({g,tray,score,comb
 function start(){const D=DF[cfg.d];g=Array.from({length:N},()=>Array(N).fill(0));score=0;combo=0;snap=null;hl=D.h;ul=D.u;playing=true;lock=false;time=60;
 try{best=+localStorage.getItem('blk-'+cfg.m+cfg.d)||0}catch(e){best=0}
 if(cfg.m==='stones'){let k=0;while(k<10){const r=rnd(N),c=rnd(N);if(!g[r][c]){g[r][c]=6;k++}}}
-fill();clearInterval(tm);$('tbox').hidden=cfg.m!=='timed';
-if(cfg.m==='timed')tm=setInterval(()=>{time--;drawHud();if(time<=0)over('Час вийшов')},1000);
+fill();clearInterval(tm);$('tbox').hidden=cfg.m==='classic'||cfg.m==='stones';if(cfg.m!=='duel')$('opp').textContent='';
+if(cfg.m==='timed'||cfg.m==='duel')tm=setInterval(()=>{time--;drawHud();if(time<=0)over('Час вийшов')},1000);
 $('menu').hidden=true;$('over').hidden=true;drawBoard();drawTray();drawHud()}
 /* меню */
-function menu(){clearInterval(tm);playing=false;['dsel','msel'].forEach(id=>[...$(id).children].forEach(b=>b.classList.toggle('on',b.dataset.v===cfg[id[0]])));
+function menu(){clearInterval(tm);playing=false;if(room){clearInterval(room.t);room=null}R=Math.random;if(cfg.m==='duel')cfg.m='classic';['dsel','msel'].forEach(id=>[...$(id).children].forEach(b=>b.classList.toggle('on',b.dataset.v===cfg[id[0]])));
 const D=DF[cfg.d];$('dinfo').textContent=`Підказок: ${D.h} (по ${D.cost} очок), скасувань ходу: ${D.u}`;$('minfo').textContent=MI[cfg.m];$('over').hidden=true;$('menu').hidden=false}
 ['dsel','msel'].forEach(id=>$(id).addEventListener('click',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v){cfg[id[0]]=v;menu()}}));
-$('play').onclick=start;$('again').onclick=start;$('tomenu').onclick=menu;$('menuBtn').onclick=menu;
+$('play').onclick=start;$('again').onclick=()=>cfg.m==='duel'?menu():start();$('tomenu').onclick=menu;$('menuBtn').onclick=menu;
 $('hint').onclick=hint;$('undo').onclick=undo;
 $('theme').onclick=()=>{th=(th+1)%TH.length;try{localStorage.setItem('blk-th',th)}catch(e){}if(drag)return;drawBoard();drawTray();drawHud()};
 $('snd').onclick=()=>{mute=!mute;drawHud()};
+/* онлайн: рекорди та дуель */
+const PID=(()=>{let p;try{p=localStorage.getItem('blk-pid');if(!p){p=Math.random().toString(36).slice(2,10);localStorage.setItem('blk-pid',p)}}catch(e){}return p||'a'+Math.random().toString(36).slice(2,8)})();
+let room=null;
+try{$('nm').value=localStorage.getItem('blk-name')||''}catch(e){}
+$('nm').oninput=()=>{try{localStorage.setItem('blk-name',$('nm').value)}catch(e){}};
+const nm=()=>$('nm').value.trim()||'Гравець';
+const api=async(p,m='GET',b)=>{if(!DBU)throw 0;const r=await fetch(DBU.replace(/\/$/,'')+'/'+p+'.json',{method:m,body:b===undefined?undefined:JSON.stringify(b)});if(!r.ok)throw 0;return r.json()};
+function mulberry32(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+async function submit(){if(!DBU||!score)return;try{const p='lb/'+cfg.d+'/'+PID,o=await api(p);if(!o||score>o.s)await api(p,'PUT',{n:nm(),s:score})}catch(e){}}
+async function showLb(d){$('lb').hidden=false;$('menu').hidden=true;[...$('lbt').children].forEach(b=>b.classList.toggle('on',b.dataset.v===d));const L=$('lbl');L.textContent=DBU?'Завантаження…':'Таблицю ще не налаштовано.';if(!DBU)return;
+try{const o=await api('lb/'+d)||{};const a=Object.entries(o).map(([k,v])=>({k,n:String(v.n),s:+v.s||0})).sort((x,y)=>y.s-x.s).slice(0,10);L.textContent='';if(!a.length)L.textContent='Поки порожньо. Стань першим!';
+a.forEach((e,i)=>{const r=document.createElement('div'),x=document.createElement('span'),y=document.createElement('span');if(e.k===PID)r.style.fontWeight='800';x.textContent=(i+1)+'. '+e.n;y.textContent=e.s;r.append(x,y);L.appendChild(r)})}catch(e){L.textContent='Немає зв’язку з таблицею.'}}
+const dm=t=>$('dmsg').textContent=t;
+async function mkRoom(){if(!DBU)return dm('Онлайн ще не налаштовано.');const code=String(1000+rnd(9000)),seed=rnd(1e9);await api('rooms/'+code,'PUT',{seed,st:0,p1:{n:nm(),s:0}});room={code,role:'p1',seed};wait()}
+async function joinRoom(){if(!DBU)return dm('Онлайн ще не налаштовано.');const code=$('code').value.trim(),o=await api('rooms/'+code);if(!o||o.p2||o.st)return dm('Кімнату не знайдено або вона вже зайнята.');await api('rooms/'+code+'/p2','PUT',{n:nm(),s:0});room={code,role:'p2',seed:o.seed};wait()}
+function wait(){dm(room.role==='p1'?'Код кімнати: '+room.code+'. Скажи його другу й чекай.':'Чекаємо, поки господар почне гру…');clearInterval(room.t);room.t=setInterval(poll,1000)}
+async function poll(){if(!room)return;try{const o=await api('rooms/'+room.code);if(!o||!room)return;const opp=o[room.role==='p1'?'p2':'p1'];
+if(room.role==='p1'&&o.p2&&!o.st&&!room.sent){room.sent=1;await api('rooms/'+room.code+'/st','PUT',1)}
+if(o.st&&!room.on){room.on=1;begin()}
+if(opp){room.opp=opp;$('opp').textContent=opp.n+': '+opp.s;if(opp.done&&room.fin)endDuel()}
+if(playing&&room.on)api('rooms/'+room.code+'/'+room.role+'/s','PUT',score).catch(()=>{})}catch(e){}}
+function begin(){$('duel').hidden=true;cfg.m='duel';cfg.d='normal';R=mulberry32(room.seed);start();hl=0;ul=0;drawHud()}
+function endDuel(){if(!room||room.ended)return;room.ended=1;clearInterval(room.t);const o=room.opp?+room.opp.s||0:0;$('otitle').textContent=score>o?'Ти переміг!':score<o?'Ти програв':'Нічия';$('final').textContent=score+' : '+o}
+const bad=()=>dm('Немає зв’язку або онлайн ще не налаштовано.');
+$('lbBtn').onclick=()=>showLb(cfg.d);
+$('lbt').onclick=e=>{const v=e.target.dataset&&e.target.dataset.v;if(v)showLb(v)};
+$('lbx').onclick=()=>{$('lb').hidden=true;if($('over').hidden)menu()};
+$('lb2').onclick=()=>showLb(cfg.d);
+$('duelBtn').onclick=()=>{$('menu').hidden=true;$('duel').hidden=false;dm('')};
+$('mk').onclick=()=>mkRoom().catch(bad);
+$('jn').onclick=()=>joinRoom().catch(bad);
+$('dx').onclick=()=>{$('duel').hidden=true;menu()};
 g=Array.from({length:N},()=>Array(N).fill(0));tray=[];drawBoard();drawHud();menu();
 </script></body></html>
