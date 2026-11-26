@@ -4,7 +4,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAC8UlEQVR42u3dsVEbURSGUfRGoQMCnDizI0I3QEwfbsEBIePQgVtwH47dAKEzCiAhoAAa8GhWEu/ef9nzFcC7oz1z34hAu7v69OVC+l/DRyA4BIfgEByCQ3AIDsEhOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQ3AIDsEhOASH3lv7xrMfbj7UHPT178uMP/v467lm/s/fL1se0K7+JxjKTExSUmaiXcnYjow3Ob1RRv3pdZujl8X5K6SXRcsKGRuUccI8UTLK5hkblHHsVGkyyqbyVVZ9ODLXxvLZMtdGzWxjszKWTJgso2BC14rgUBSO/Dvl8Jz5d8rsOW0OwSE4BIfgEByCQ3AIDsEhOCQ4BIfgEByCQ3AIDsEhOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQyvBMeldBWVzdr2r4NjmzWlzCA6l4ci/WQ5PmH+zTJ1w9H76yTLyfcyezbWiVhyZy2P5VJnLo2CqkfYkMudJ81EzT/ULANt/8/pMpu2/eV3JdKzr2bSf3rtCik9veHVo/RbxXtn14ZBvK4JDcAgOCQ7BoRPaN5798eePmoOe7u5n/Nnbb/9q5v/z+7rlATX8n6PMxCQlZSbalYztyHiT0xtl1J9etzl6WZy/QnpZtKyQsUEZJ8wTJaNsnrFBGcdOlSajbCpfZdWHI3NtLJ8tc23UzDY2K2PJhMkyCiZ0rQgOReHIv1MOz5l/p8ye0+YQHIJDcAgOwSE4BIfgEByCQ4JDcAgOwSE4BIfgEByCQ3BIcAgOwSE4BIfgEByCQ3AIDgkOwSE4tBIck95VUDZn17sKjm3enDaH4FAajvyb5fCE+TfL1AlH76efLCPfx+zZXCtqxZG5PJZPlbk8CqYaaU8ic540HzXzVL8AsP03r89k2v6b15VMx7qeTfvpvSuk+PSGV4fWbxHvlV0fDvm2IjgEh+CQ4BAcgkNwCA7BITgEh+AQHIJDgkNwCA7BITgEh+AQHIJDcEhwCA7BoSm9AmlR0NJh8dEsAAAAAElFTkSuQmCC">
 <meta name="apple-mobile-web-app-title" content="Блоки">
-<title>Блоки</title>
+<title>Блоки v0.10</title>
 <style>
 :root{--bg:#eef2f5;--fg:#1c2430;--cell:#d9e1e8;--panel:#e3e9ee;--w:min(92vw,50vh,520px);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a22;--fg:#e8edf2;--cell:#222c38;--panel:#1a222c;color-scheme:dark}}
@@ -45,7 +45,7 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 #pop{position:fixed;left:0;right:0;top:30%;text-align:center;font-size:clamp(28px,5vh,44px);font-weight:800;color:#f3a712;text-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none;z-index:15;opacity:0}
 #pop.go{animation:pp 1s}
 @keyframes pp{0%{opacity:1;transform:translateY(20px)}70%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
-.ov{position:fixed;inset:0;background:rgba(10,14,20,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;z-index:20;padding:20px;text-align:center;overflow:auto}
+.ov{position:fixed;inset:0;background:rgba(10,14,20,.82);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;color:#fff;z-index:20;padding:20px;text-align:center;overflow:auto}
 .ov h2{margin:0;font-size:36px}
 .ov p{margin:0;font-size:17px;opacity:.85;min-height:22px}
 .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -59,6 +59,9 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 :root.land body{display:grid;grid-template-columns:auto var(--pw);align-content:center;justify-content:center;gap:10px 28px}
 :root.land #board{grid-column:1;grid-row:1/span 4}
 :root.land header,:root.land #goal,:root.land #tray,:root.land #bar{grid-column:2;align-self:center}
+#menu h2 small{font-size:16px;font-weight:400;-webkit-text-fill-color:rgba(255,255,255,.7)}
+.ov>:first-child{margin-top:auto}.ov>:last-child{margin-bottom:auto}
+@media (max-height:760px){.ov{gap:8px;padding:12px}#menu h2{font-size:38px}.row button{font-size:16px;padding:8px 12px}.go2{font-size:19px;padding:11px 26px}.ov p{font-size:15px;min-height:0}}
 </style></head><body>
 <header><div><small>Рахунок</small><b id="score">0</b></div><div id="tbox" hidden style="align-items:center"><small>Час</small><b id="time">60</b><small id="opp"></small></div><div style="align-items:flex-end"><small>Рекорд</small><b id="best">0</b></div></header>
 <div id="goal" hidden></div>
@@ -66,7 +69,7 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 <div id="tray"></div>
 <div id="bar"><button id="hint"></button><button id="undo"></button><button id="theme"></button><button id="snd">Звук: так</button><button id="menuBtn">Меню</button></div>
 <div id="pop"></div>
-<div id="menu" class="ov"><h2>Блоки</h2><input id="nm" maxlength="12" placeholder="Твоє ім’я">
+<div id="menu" class="ov"><h2>Блоки <small>v0.10</small></h2><input id="nm" maxlength="12" placeholder="Твоє ім’я">
 <small>Складність</small><div class="row" id="dsel"><button data-v="easy">Легко</button><button data-v="normal">Нормально</button><button data-v="hard">Складно</button></div><p id="dinfo"></p>
 <small>Режим</small><div class="row" id="msel"><button data-v="classic">Класичний</button><button data-v="timed">На час</button><button data-v="stones">З перешкодами</button><button data-v="adv">Пригода</button></div><p id="minfo"></p>
 <button id="play" class="go2">Грати</button><div class="row"><button id="lbBtn">Таблиця рекордів</button><button id="duelBtn">Онлайн дуель</button></div></div>
@@ -82,7 +85,7 @@ const APIKEY='AIzaSyD8WOuu7GKwPBfon1rqxJXBZ_sUdOiv0QI';
 let R=Math.random;
 const N=8,STONE='#7b8794';
 const PAT={A:(r,c)=>(r===0||r===7)&&(c===0||c===7),B:(r,c)=>r>2&&r<5&&c>2&&c<5,C:(r,c)=>(r+c)%2===0&&r>1&&r<6&&c>1&&c<6,D:(r,c)=>r>=2&&r<=5&&(c===2||c===5),H:(r,c)=>r===3&&c%2===1,I:(r,c)=>c===3&&r%2===0,K:(r,c)=>(r===0&&c<3)||(c===0&&r<3)||(r===7&&c>4)||(c===7&&r>4),L:(r,c)=>(r===3&&c>=2&&c<=5)||(c===3&&r>=2&&r<=5),N:(r,c)=>((r===2||r===5)&&c>=2&&c<=5)||((c===2||c===5)&&r>=2&&r<=5)};
-const LV=[['lines',4,24,0,'easy'],['stones',4,34,'B','easy'],['score',130,34,0,'easy'],['lines',5,26,'A','easy'],['stones',4,38,'H','easy'],['score',140,36,'I','easy'],['lines',6,29,'L','easy'],['stones',10,47,'K','easy'],['score',180,42,'D','easy'],['lines',7,33,'C','easy'],['stones',8,55,'C','easy'],['score',210,47,'N','easy'],['lines',8,31,'K','normal'],['stones',7,30,'L','normal'],['score',290,52,'B','normal']].map(([t,n,mv,p,d])=>({t,n,mv,p:p?PAT[p]:null,d}));
+const LV=[['lines',4,24,0,'easy'],['stones',4,30,'B','easy'],['score',130,34,0,'easy'],['lines',5,26,'A','easy'],['stones',4,38,'H','easy'],['score',140,36,'I','easy'],['lines',6,29,'L','easy'],['stones',10,47,'K','easy'],['score',180,42,'D','easy'],['lines',7,33,'C','easy'],['stones',8,40,'C','easy'],['score',260,42,'N','easy'],['lines',9,30,'K','normal'],['stones',7,22,'L','normal'],['score',340,48,'B','normal']].map(([t,n,mv,p,d])=>({t,n,mv,p:p?PAT[p]:null,d}));
 let TS=30;
 let lv=0,lc=0,mv=0,lvmax=1;
 try{lvmax=+localStorage.getItem('blk-lv')||1}catch(e){}
@@ -102,7 +105,11 @@ function shake(){bd.classList.remove('shake');void bd.offsetWidth;bd.classList.a
 function pop(t){const p=$('pop');p.textContent=t;p.classList.remove('go');void p.offsetWidth;p.classList.add('go')}
 /* фігури */
 function pick(){const w=SH.map(s=>DF[cfg.d].w(s.flat().reduce((a,b)=>a+b,0)));let r=R()*w.reduce((a,b)=>a+b,0),i=0;while(i<SH.length-1&&(r-=w[i])>0)i++;return{s:SH[i],c:rnd(5)}}
-function fill(){tray=[pick(),pick(),pick()]}
+function fitsOn(G,p,r0,c0){return p.s.every((row,i)=>row.every((v,j)=>{if(!v)return true;const r=r0+i,c=c0+j;return r>=0&&c>=0&&r<N&&c<N&&!G[r][c]}))}
+function putOn(G,p,r0,c0){const t=G.map(r=>r.slice());p.s.forEach((row,i)=>row.forEach((v,j)=>{if(v)t[r0+i][c0+j]=1}));const R=[],C=[];for(let k=0;k<N;k++){if(t[k].every(Boolean))R.push(k);if(t.every(r=>r[k]))C.push(k)}R.forEach(r=>{for(let c=0;c<N;c++)t[r][c]=0});C.forEach(c=>{for(let r=0;r<N;r++)t[r][c]=0});return t}
+function solv(ps,G){if(!ps.length)return true;for(let i=0;i<ps.length;i++){const p=ps[i],rest=ps.filter((_,j)=>j!==i);for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fitsOn(G,p,r,c)&&solv(rest,putOn(G,p,r,c)))return true}return false}
+/* нові фігури завжди можна розмістити всі три (крім дуелі, де вони однакові в обох) */
+function fill(G){let t;for(let k=0;k<30;k++){t=[pick(),pick(),pick()];if(cfg.m==='duel'||solv(t,G||g))break}tray=t}
 function mk(p,sz,stone){const e=document.createElement('div');e.className='pc';e.style.gridTemplateColumns=`repeat(${p.s[0].length},${sz}px)`;e.style.gridAutoRows=sz+'px';p.s.forEach(row=>row.forEach(v=>{const d=document.createElement('div');if(v){d.className='b';d.style.backgroundColor=col(p.c+1)}e.appendChild(d)}));return e}
 /* малювання */
 function drawBoard(pv){cells.forEach((d,k)=>{const v=g[k/N|0][k%N];d.className='c'+(v?(v===6?' f s':' f'):'');d.style.backgroundColor=v?col(v):'';d.style.opacity=''});
@@ -127,7 +134,7 @@ function place(d){const{p,t}=d;snap={g:g.map(r=>r.slice()),tray:tray.slice(),sco
 let n=0;p.s.forEach((row,i)=>row.forEach((v,j)=>{if(v){g[t.r+i][t.c+j]=p.c+1;n++}}));
 const rows=[],cols=[];for(let k=0;k<N;k++){if(g[k].every(Boolean))rows.push(k);if(g.every(r=>r[k]))cols.push(k)}
 const L=rows.length+cols.length;mv++;lc+=L;combo=L?combo+1:0;const mult=L?Math.min(combo,5):1,pts=(n+L*10*L)*mult;score+=pts;
-tray[d.i]=null;if(tray.every(x=>!x))fill();
+tray[d.i]=null;if(tray.every(x=>!x)){const t=g.map(r=>r.slice());rows.forEach(r=>{for(let c=0;c<N;c++)t[r][c]=0});cols.forEach(c=>{for(let r=0;r<N;r++)t[r][c]=0});fill(t)}
 if(score>best){best=score;try{localStorage.setItem('blk-'+cfg.m+cfg.d,best)}catch(e){}}
 drawBoard();drawTray();drawHud();
 keys(p,t).forEach(k=>cells[k].classList.add('pl'));if(!L){tone(300,.08,'triangle');return check()}
