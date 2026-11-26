@@ -11,7 +11,7 @@
 :root[data-theme="dark"]{--bg:#141a22;--fg:#e8edf2;--cell:#222c38;--panel:#1a222c;color-scheme:dark}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:var(--bg);color:var(--fg);touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;font-family:ui-rounded,"SF Pro Rounded",system-ui,sans-serif}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:radial-gradient(120% 70% at 50% 0%,var(--glow,transparent),var(--bg) 65%) var(--bg);color:var(--fg);touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;font-family:ui-rounded,"SF Pro Rounded",system-ui,sans-serif}
 header{width:var(--w);display:flex;justify-content:space-between;align-items:flex-end}
 header div{display:flex;flex-direction:column}
 header small{font-size:15px;opacity:.65}
@@ -20,12 +20,22 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 #board{width:var(--w);aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);background:var(--panel);border-radius:14px}
 .c,.b{border:2px solid transparent;background-clip:padding-box;border-radius:28%}
 .c{background-color:var(--cell)}
+.c.f,.b{background-image:linear-gradient(145deg,rgba(255,255,255,.38),rgba(0,0,0,.2))}
+.c.s{background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.28) 0 4px,transparent 4px 8px),linear-gradient(145deg,rgba(255,255,255,.3),rgba(0,0,0,.2))}
+.c.pl{animation:pl .2s}
+@keyframes pl{0%{transform:scale(.6)}100%{transform:scale(1)}}
+#goal{width:var(--w);text-align:center;font-size:16px;font-weight:700;padding:8px 10px;border-radius:12px;background:var(--panel);box-sizing:border-box}
+#menu h2{font-size:48px;background:linear-gradient(90deg,#f3a712,#e4572e,#b05bd1);-webkit-background-clip:text;background-clip:text;color:transparent}
+#lvg button{width:78px;height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:22px;font-weight:800;padding:4px}
+#lvg button small{font-size:12px;font-weight:400}
+#lvg button:disabled{opacity:.3}
+#lvg button.dn{border-color:#29a3a3}
 .c.clr{animation:clr .3s forwards}
 @keyframes clr{40%{transform:scale(1.15);filter:brightness(1.8)}100%{transform:scale(0);opacity:0}}
 .shake{animation:sh .3s}
 @keyframes sh{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 #tray{width:var(--w);display:flex;justify-content:space-around}
-.slot{width:33%;min-height:130px;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.slot{width:31%;min-height:130px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:var(--panel)}
 .slot.hl{outline:3px solid #f3a712}
 .pc{display:grid}
 .ghost{position:fixed;pointer-events:none;z-index:9;filter:drop-shadow(0 8px 10px rgba(0,0,0,.3))}
@@ -48,17 +58,19 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 #lbl div{display:flex;justify-content:space-between;gap:20px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.15)}
 </style></head><body>
 <header><div><small>Рахунок</small><b id="score">0</b></div><div id="tbox" hidden style="align-items:center"><small>Час</small><b id="time">60</b><small id="opp"></small></div><div style="align-items:flex-end"><small>Рекорд</small><b id="best">0</b></div></header>
+<div id="goal" hidden></div>
 <div id="board"></div>
 <div id="tray"></div>
 <div id="bar"><button id="hint"></button><button id="undo"></button><button id="theme"></button><button id="snd">Звук: так</button><button id="menuBtn">Меню</button></div>
 <div id="pop"></div>
 <div id="menu" class="ov"><h2>Блоки</h2><input id="nm" maxlength="12" placeholder="Твоє ім’я">
 <small>Складність</small><div class="row" id="dsel"><button data-v="easy">Легко</button><button data-v="normal">Нормально</button><button data-v="hard">Складно</button></div><p id="dinfo"></p>
-<small>Режим</small><div class="row" id="msel"><button data-v="classic">Класичний</button><button data-v="timed">На час</button><button data-v="stones">З перешкодами</button></div><p id="minfo"></p>
+<small>Режим</small><div class="row" id="msel"><button data-v="classic">Класичний</button><button data-v="timed">На час</button><button data-v="stones">З перешкодами</button><button data-v="adv">Пригода</button></div><p id="minfo"></p>
 <button id="play" class="go2">Грати</button><div class="row"><button id="lbBtn">Таблиця рекордів</button><button id="duelBtn">Онлайн дуель</button></div></div>
-<div id="over" class="ov" hidden><h2 id="otitle">Гра закінчилась</h2><p>Рахунок: <span id="final">0</span></p><button id="again" class="go2">Грати ще раз</button><button id="lb2" class="go2" hidden>Рекорди</button><button id="tomenu" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Меню</button></div>
+<div id="over" class="ov" hidden><h2 id="otitle">Гра закінчилась</h2><p>Рахунок: <span id="final">0</span></p><p id="omsg"></p><button id="again" class="go2">Грати ще раз</button><button id="lb2" class="go2" hidden>Рекорди</button><button id="nx" class="go2" hidden>Наступний рівень</button><button id="rm" class="go2" hidden>Реванш</button><button id="tomenu" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Меню</button></div>
 <div id="duel" class="ov" hidden><h2>Онлайн дуель</h2><p>60 секунд, у обох однакові фігури. Перемагає той, хто набере більше очок.</p><button id="mk" class="go2">Створити кімнату</button><div class="row"><input id="code" inputmode="numeric" maxlength="4" placeholder="Код кімнати"><button id="jn">Увійти</button></div><p id="dmsg"></p><button id="dx" class="go2" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)">Назад</button></div>
 <div id="lb" class="ov" hidden><h2>Рекорди: на час</h2><div class="row" id="lbt"><button data-v="easy">Легко</button><button data-v="normal">Нормально</button><button data-v="hard">Складно</button></div><div id="lbl"></div><button id="lbx" class="go2">Закрити</button></div>
+<div id="lv" class="ov" hidden><h2>Пригода</h2><div id="lvg" class="row"></div><button id="lvx" class="go2">Назад</button></div>
 <script>
 /* Адреса бази Firebase для рекордів і дуелі. Встав її між лапками, наприклад https://назва-default-rtdb.firebaseio.com */
 const DBU='https://blocks-4a3fc-default-rtdb.europe-west1.firebasedatabase.app';
@@ -66,9 +78,16 @@ const DBU='https://blocks-4a3fc-default-rtdb.europe-west1.firebasedatabase.app';
 const APIKEY='AIzaSyD8WOuu7GKwPBfon1rqxJXBZ_sUdOiv0QI';
 let R=Math.random;
 const N=8,STONE='#7b8794';
+const PAT=[(r,c)=>(r<2||r>5)&&(c<2||c>5),(r,c)=>r>2&&r<5&&c>2&&c<5,(r,c)=>(r+c)%2===0&&r>1&&r<6&&c>1&&c<6,(r,c)=>r%3===1&&c%2===0,(r,c)=>r===c||r+c===7,(r,c)=>(r===0||r===7||c===0||c===7)&&(r+c)%2===0];
+const LV=Array.from({length:15},(_,i)=>{const k=i+1,t=['lines','stones','score'][i%3],p=PAT[(i+Math.floor(i/6))%6];
+if(t==='lines')return{t,n:3+k,mv:3*(3+k)+6,p:k>3?p:null};
+if(t==='stones'){let s=0;for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(p(r,c))s++;return{t,n:s,mv:22+k*2,p}}
+return{t,n:80+25*k,mv:20+2*k,p:k>3?p:null}});
+let lv=0,lc=0,mv=0,lvmax=1;
+try{lvmax=+localStorage.getItem('blk-lv')||1}catch(e){}
 const TH=[{n:'Захід',c:['#e4572e','#f3a712','#29a3a3','#5b7cfa','#b05bd1']},{n:'Океан',c:['#0ea5a4','#38bdf8','#6366f1','#34d399','#f0abfc']},{n:'Неон',c:['#ff2e93','#ffe600','#00f5d4','#9b5cff','#ff7a00']}];
 const DF={easy:{h:5,cost:10,u:3,w:n=>Math.max(1,7-n)},normal:{h:3,cost:20,u:2,w:()=>1},hard:{h:2,cost:30,u:1,w:n=>n}};
-const MI={classic:'Грай без обмежень, поки є ходи.',timed:'60 секунд, набери якомога більше.',stones:'На полі 10 каменів, вони зникають разом з лініями.'};
+const MI={classic:'Грай без обмежень, поки є ходи.',timed:'60 секунд, набери якомога більше.',stones:'На полі 10 каменів, вони зникають разом з лініями.',adv:'15 рівнів з різними цілями: лінії, камені, очки. Складність: нормально.'};
 const SH=[[[1]],[[1,1]],[[1],[1]],[[1,1,1]],[[1],[1],[1]],[[1,1,1,1]],[[1],[1],[1],[1]],[[1,1],[1,1]],[[1,1,1],[1,1,1],[1,1,1]],[[1,0],[1,1]],[[0,1],[1,1]],[[1,1],[1,0]],[[1,1],[0,1]],[[1,0,0],[1,0,0],[1,1,1]],[[1,1,1],[1,0,0]],[[1,1,1],[0,1,0]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
 const $=id=>document.getElementById(id),bd=$('board'),tr=$('tray'),cells=[],rnd=n=>R()*n|0;
 let cfg={d:'normal',m:'classic'},th=0,g,tray,score=0,best=0,combo=0,snap=null,hl=0,ul=0,time=60,tm,ht,drag=null,playing=false,lock=false,mute=false,AC;
@@ -85,13 +104,13 @@ function pick(){const w=SH.map(s=>DF[cfg.d].w(s.flat().reduce((a,b)=>a+b,0)));le
 function fill(){tray=[pick(),pick(),pick()]}
 function mk(p,sz,stone){const e=document.createElement('div');e.className='pc';e.style.gridTemplateColumns=`repeat(${p.s[0].length},${sz}px)`;e.style.gridAutoRows=sz+'px';p.s.forEach(row=>row.forEach(v=>{const d=document.createElement('div');if(v){d.className='b';d.style.backgroundColor=col(p.c+1)}e.appendChild(d)}));return e}
 /* малювання */
-function drawBoard(pv){cells.forEach((d,k)=>{const v=g[k/N|0][k%N];d.className='c';d.style.backgroundColor=v?col(v):'';d.style.opacity=''});
-if(pv)pv.set.forEach(k=>{const d=cells[k];d.style.backgroundColor=pv.ok?pv.c:'#e4572e';d.style.opacity=pv.ok?.5:.35})}
+function drawBoard(pv){cells.forEach((d,k)=>{const v=g[k/N|0][k%N];d.className='c'+(v?(v===6?' f s':' f'):'');d.style.backgroundColor=v?col(v):'';d.style.opacity=''});
+if(pv)pv.set.forEach(k=>{const d=cells[k];d.classList.add('f');d.style.backgroundColor=pv.ok?pv.c:'#e4572e';d.style.opacity=pv.ok?.5:.35})}
 function drawTray(hi){tr.innerHTML='';tray.forEach((p,i)=>{const s=document.createElement('div');s.className='slot'+(i===hi?' hl':'');if(p){const m=mk(p,30);m.dataset.i=i;m.style.touchAction='none';m.addEventListener('pointerdown',down);s.appendChild(m)}tr.appendChild(s)})}
 function drawHud(){const D=DF[cfg.d];$('score').textContent=score;$('best').textContent=best;$('time').textContent=time;
 $('hint').textContent=`Підказка −${D.cost} (${hl})`;$('hint').classList.toggle('off',hl<=0||score<D.cost);
 $('undo').textContent=`Назад (${ul})`;$('undo').classList.toggle('off',ul<=0||!snap);
-$('theme').textContent=TH[th].n;$('snd').textContent=mute?'Звук: ні':'Звук: так'}
+$('theme').textContent=TH[th].n;$('snd').textContent=mute?'Звук: ні':'Звук: так';document.documentElement.style.setProperty('--glow',TH[th].c[0]+'3a');goalHud()}
 /* логіка */
 function fits(p,r0,c0){return p.s.every((row,i)=>row.every((v,j)=>{if(!v)return true;const r=r0+i,c=c0+j;return r>=0&&c>=0&&r<N&&c<N&&!g[r][c]}))}
 function anyFit(p){for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fits(p,r,c))return true;return false}
@@ -103,37 +122,39 @@ const t={c:Math.round((x-r.left)/cs),r:Math.round((y-r.top)/cs)};drag.t=t;drawBo
 function cleanup(){removeEventListener('pointermove',move);removeEventListener('pointerup',up);removeEventListener('pointercancel',cancel);drag.gh.remove();const d=drag;drag=null;return d}
 function cancel(){cleanup();drawBoard();drawTray()}
 function up(){const d=cleanup();if(d.t&&fits(d.p,d.t.r,d.t.c))place(d);else{tone(140,.15,'sawtooth',.1);shake();drawBoard();drawTray()}}
-function place(d){const{p,t}=d;snap={g:g.map(r=>r.slice()),tray:tray.slice(),score,combo};
+function place(d){const{p,t}=d;snap={g:g.map(r=>r.slice()),tray:tray.slice(),score,combo,mv,lc};
 let n=0;p.s.forEach((row,i)=>row.forEach((v,j)=>{if(v){g[t.r+i][t.c+j]=p.c+1;n++}}));
 const rows=[],cols=[];for(let k=0;k<N;k++){if(g[k].every(Boolean))rows.push(k);if(g.every(r=>r[k]))cols.push(k)}
-const L=rows.length+cols.length;combo=L?combo+1:0;const mult=L?Math.min(combo,5):1,pts=(n+L*10*L)*mult;score+=pts;
+const L=rows.length+cols.length;mv++;lc+=L;combo=L?combo+1:0;const mult=L?Math.min(combo,5):1,pts=(n+L*10*L)*mult;score+=pts;
 tray[d.i]=null;if(tray.every(x=>!x))fill();
 if(score>best){best=score;try{localStorage.setItem('blk-'+cfg.m+cfg.d,best)}catch(e){}}
 drawBoard();drawTray();drawHud();
-if(!L){tone(300,.08,'triangle');return check()}
+keys(p,t).forEach(k=>cells[k].classList.add('pl'));if(!L){tone(300,.08,'triangle');return check()}
 lock=true;const ks=new Set();rows.forEach(r=>{for(let c=0;c<N;c++)ks.add(r*N+c)});cols.forEach(c=>{for(let r=0;r<N;r++)ks.add(r*N+c)});
 ks.forEach(k=>cells[k].classList.add('clr'));
 for(let i=0;i<2+Math.min(L,3);i++)tone([523,659,784,1047,1319][i]*(1+(mult-1)*.06),.18,'sine',.16,i*.07);
 if(L>1)shake();pop(`+${pts}`+(mult>1?`  Комбо ×${mult}`:''));
-setTimeout(()=>{ks.forEach(k=>g[k/N|0][k%N]=0);lock=false;drawBoard();check()},320)}
-function check(){if(playing&&!tray.some(x=>x&&anyFit(x)))over('Немає ходів')}
-function over(t){playing=false;clearInterval(tm);tone(400,.25,'triangle',.15);tone(300,.25,'triangle',.15,.2);tone(200,.4,'triangle',.15,.4);$('otitle').textContent=t;$('final').textContent=score;$('over').hidden=false;$('lb2').hidden=cfg.m!=='timed';if(cfg.m==='timed')submit();if(cfg.m==='duel'&&room){room.fin=1;$('otitle').textContent='Чекаємо суперника…';api('rooms/'+room.code+'/'+room.role,'PUT',{n:nm(),s:score,done:1}).catch(()=>{});setTimeout(endDuel,70000)}}
+setTimeout(()=>{ks.forEach(k=>g[k/N|0][k%N]=0);lock=false;drawBoard();drawHud();check()},320)}
+function check(){if(!playing)return;if(cfg.m==='adv'){const v=LV[lv];if(v.t==='lines'?lc>=v.n:v.t==='stones'?!g.some(r=>r.includes(6)):score>=v.n)return win();if(mv>=v.mv)return over('Ходи закінчилися')}
+if(!tray.some(x=>x&&anyFit(x)))over('Немає ходів')}
+function over(t){playing=false;clearInterval(tm);tone(400,.25,'triangle',.15);tone(300,.25,'triangle',.15,.2);tone(200,.4,'triangle',.15,.4);$('otitle').textContent=t;$('final').textContent=score;$('over').hidden=false;$('lb2').hidden=cfg.m!=='timed';$('nx').hidden=true;$('rm').hidden=true;$('again').hidden=cfg.m==='duel';$('omsg').textContent=cfg.m==='duel'?'Суперник ще грає…':'';if(cfg.m==='timed')submit();if(cfg.m==='duel'&&room){room.fin=1;$('otitle').textContent='Чекаємо суперника…';api('rooms/'+room.code+'/'+room.role,'PUT',{n:nm(),s:score,done:1}).catch(()=>{});{const r0=room.rd;setTimeout(()=>{if(room&&room.rd===r0)endDuel()},70000)}}}
 function hint(){if(lock||!playing||drag)return;const D=DF[cfg.d];if(hl<=0||score<D.cost){shake();tone(140,.15,'sawtooth',.1);return}
 let b=null;tray.forEach((p,i)=>{if(!p)return;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fits(p,r,c)){const L=sim(p,r,c);if(!b||L>b.L)b={p,i,t:{r,c},L}}});
 if(!b)return;score-=D.cost;hl--;drawHud();drawBoard({set:keys(b.p,b.t),ok:true,c:col(b.p.c+1)});drawTray(b.i);tone(880,.12,'sine',.12);
 clearTimeout(ht);ht=setTimeout(()=>{if(!drag){drawBoard();drawTray()}},2800)}
-function undo(){if(lock||!playing||drag||!snap||ul<=0)return;({g,tray,score,combo}=snap);snap=null;ul--;clearTimeout(ht);drawBoard();drawTray();drawHud();tone(440,.1,'triangle')}
+function undo(){if(lock||!playing||drag||!snap||ul<=0)return;({g,tray,score,combo,mv,lc}=snap);snap=null;ul--;clearTimeout(ht);drawBoard();drawTray();drawHud();tone(440,.1,'triangle')}
 function start(){const D=DF[cfg.d];g=Array.from({length:N},()=>Array(N).fill(0));score=0;combo=0;snap=null;hl=D.h;ul=D.u;playing=true;lock=false;time=60;
 try{best=+localStorage.getItem('blk-'+cfg.m+cfg.d)||0}catch(e){best=0}
+lc=0;mv=0;if(cfg.m==='adv'){const v=LV[lv];if(v.p)for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(v.p(r,c))g[r][c]=6}
 if(cfg.m==='stones'){let k=0;while(k<10){const r=rnd(N),c=rnd(N);if(!g[r][c]){g[r][c]=6;k++}}}
-fill();clearInterval(tm);$('tbox').hidden=cfg.m==='classic'||cfg.m==='stones';if(cfg.m!=='duel')$('opp').textContent='';
+fill();clearInterval(tm);$('tbox').hidden=!(cfg.m==='timed'||cfg.m==='duel');if(cfg.m!=='duel')$('opp').textContent='';
 if(cfg.m==='timed'||cfg.m==='duel')tm=setInterval(()=>{time--;drawHud();if(time<=0)over('Час вийшов')},1000);
-$('menu').hidden=true;$('over').hidden=true;drawBoard();drawTray();drawHud()}
+$('menu').hidden=true;$('over').hidden=true;$('nx').hidden=true;drawBoard();drawTray();drawHud()}
 /* меню */
 function menu(){clearInterval(tm);playing=false;if(room){clearInterval(room.t);room=null}R=Math.random;if(cfg.m==='duel')cfg.m='classic';['dsel','msel'].forEach(id=>[...$(id).children].forEach(b=>b.classList.toggle('on',b.dataset.v===cfg[id[0]])));
 const D=DF[cfg.d];$('dinfo').textContent=`Підказок: ${D.h} (по ${D.cost} очок), скасувань ходу: ${D.u}`;$('minfo').textContent=MI[cfg.m];$('over').hidden=true;$('menu').hidden=false}
 ['dsel','msel'].forEach(id=>$(id).addEventListener('click',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v){cfg[id[0]]=v;menu()}}));
-$('play').onclick=start;$('again').onclick=()=>cfg.m==='duel'?menu():start();$('tomenu').onclick=menu;$('menuBtn').onclick=menu;
+$('play').onclick=()=>cfg.m==='adv'?showLv():start();$('again').onclick=()=>cfg.m==='duel'?menu():start();$('tomenu').onclick=menu;$('menuBtn').onclick=menu;
 $('hint').onclick=hint;$('undo').onclick=undo;
 $('theme').onclick=()=>{th=(th+1)%TH.length;try{localStorage.setItem('blk-th',th)}catch(e){}if(drag)return;drawBoard();drawTray();drawHud()};
 $('snd').onclick=()=>{mute=!mute;drawHud()};
@@ -155,16 +176,20 @@ async function showLb(d){$('lb').hidden=false;$('menu').hidden=true;[...$('lbt')
 try{const o=await api('lb/'+d)||{};const a=Object.entries(o).map(([k,v])=>({k,n:String(v.n),s:+v.s||0})).sort((x,y)=>y.s-x.s).slice(0,10);L.textContent='';if(!a.length)L.textContent='Поки порожньо. Стань першим!';
 a.forEach((e,i)=>{const r=document.createElement('div'),x=document.createElement('span'),y=document.createElement('span');if(e.k===PID)r.style.fontWeight='800';x.textContent=(i+1)+'. '+e.n;y.textContent=e.s;r.append(x,y);L.appendChild(r)})}catch(e){L.textContent='Немає зв’язку з таблицею.'}}
 const dm=t=>$('dmsg').textContent=t;
-async function mkRoom(){if(!DBU)return dm('Онлайн ще не налаштовано.');const code=String(1000+rnd(9000)),seed=rnd(1e9);await api('rooms/'+code,'PUT',{seed,st:0,p1:{n:nm(),s:0}});room={code,role:'p1',seed};wait()}
-async function joinRoom(){if(!DBU)return dm('Онлайн ще не налаштовано.');const code=$('code').value.trim(),o=await api('rooms/'+code);if(!o||o.p2||o.st)return dm('Кімнату не знайдено або вона вже зайнята.');await api('rooms/'+code+'/p2','PUT',{n:nm(),s:0});room={code,role:'p2',seed:o.seed};wait()}
+async function mkRoom(){if(!DBU)return dm('Онлайн ще не налаштовано.');const code=String(1000+rnd(9000)),seed=rnd(1e9);await api('rooms/'+code,'PUT',{seed,st:0,rd:0,p1:{n:nm(),s:0}});room={code,role:'p1',seed,rd:0};wait()}
+async function joinRoom(){if(!DBU)return dm('Онлайн ще не налаштовано.');const code=$('code').value.trim(),o=await api('rooms/'+code);if(!o||o.p2||o.st)return dm('Кімнату не знайдено або вона вже зайнята.');await api('rooms/'+code+'/p2','PUT',{n:nm(),s:0});room={code,role:'p2',seed:o.seed,rd:o.rd||0};wait()}
 function wait(){dm(room.role==='p1'?'Код кімнати: '+room.code+'. Скажи його другу й чекай.':'Чекаємо, поки господар почне гру…');clearInterval(room.t);room.t=setInterval(poll,1000)}
 async function poll(){if(!room)return;try{const o=await api('rooms/'+room.code);if(!o||!room)return;const opp=o[room.role==='p1'?'p2':'p1'];
 if(room.role==='p1'&&o.p2&&!o.st&&!room.sent){room.sent=1;await api('rooms/'+room.code+'/st','PUT',1)}
+const rd=o.rd||0;
+if(rd>room.rd){room.rd=rd;room.seed=o.seed;room.fin=false;room.ended=false;room.opp=null;room.rsent=false;room.on=1;begin();return}
+if(room.role==='p1'&&o.rq&&o.p1&&o.p2&&o.rq.p1===rd+1&&o.rq.p2===rd+1&&!room.rsent){room.rsent=true;await api('rooms/'+room.code,'PUT',{seed:Math.random()*1e9|0,st:1,rd:rd+1,p1:{n:o.p1.n,s:0},p2:{n:o.p2.n,s:0}})}
 if(o.st&&!room.on){room.on=1;begin()}
-if(opp){room.opp=opp;$('opp').textContent=opp.n+': '+opp.s;if(opp.done&&room.fin)endDuel()}
+if(opp){room.opp=opp;$('opp').textContent=opp.n+': '+opp.s;if(opp.done&&room.fin)endDuel();else if(room.fin&&!room.ended){$('final').textContent=score+' : '+opp.s;$('omsg').textContent='Суперник ще грає…'}}
+if(room.ended&&o.rq&&!$('rm').hidden){const oq=o.rq[room.role==='p1'?'p2':'p1'];if(oq===rd+1)$('omsg').textContent='Друг хоче реванш!'}
 if(playing&&room.on)api('rooms/'+room.code+'/'+room.role+'/s','PUT',score).catch(()=>{})}catch(e){}}
 function begin(){$('duel').hidden=true;cfg.m='duel';cfg.d='normal';R=mulberry32(room.seed);start();hl=0;ul=0;drawHud()}
-function endDuel(){if(!room||room.ended)return;room.ended=1;clearInterval(room.t);const o=room.opp?+room.opp.s||0:0;$('otitle').textContent=score>o?'Ти переміг!':score<o?'Ти програв':'Нічия';$('final').textContent=score+' : '+o}
+function endDuel(){if(!room||room.ended||!room.fin)return;room.ended=1;$('omsg').textContent='';$('rm').hidden=false;const o=room.opp?+room.opp.s||0:0;$('otitle').textContent=score>o?'Ти переміг!':score<o?'Ти програв':'Нічия';$('final').textContent=score+' : '+o}
 const bad=()=>dm('Немає зв’язку або онлайн ще не налаштовано.');
 $('lbBtn').onclick=()=>showLb(cfg.d);
 $('lbt').onclick=e=>{const v=e.target.dataset&&e.target.dataset.v;if(v)showLb(v)};
@@ -174,5 +199,16 @@ $('duelBtn').onclick=()=>{$('menu').hidden=true;$('duel').hidden=false;dm('')};
 $('mk').onclick=()=>mkRoom().catch(bad);
 $('jn').onclick=()=>joinRoom().catch(bad);
 $('dx').onclick=()=>{$('duel').hidden=true;menu()};
+/* пригода та реванш */
+function goalHud(){const e=$('goal');e.hidden=cfg.m!=='adv';if(cfg.m!=='adv')return;const v=LV[lv],st=g.flat().filter(x=>x===6).length;
+e.textContent=`Рівень ${lv+1}: `+(v.t==='lines'?`лінії ${Math.min(lc,v.n)}/${v.n}`:v.t==='stones'?`каменів лишилось ${st}`:`очки ${Math.min(score,v.n)}/${v.n}`)+` · ходів ${Math.max(0,v.mv-mv)}`}
+function showLv(){$('menu').hidden=true;$('lv').hidden=false;const b=$('lvg');b.textContent='';
+LV.forEach((v,i)=>{const e=document.createElement('button'),s=document.createElement('small');e.textContent=(i<lvmax-1?'✓ ':'')+(i+1);s.textContent={lines:'лінії',stones:'камені',score:'очки'}[v.t];e.appendChild(s);e.disabled=i>=lvmax;if(i<lvmax-1)e.className='dn';e.onclick=()=>{$('lv').hidden=true;lv=i;cfg.d='normal';start()};b.appendChild(e)})}
+function win(){playing=false;clearInterval(tm);[523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',.16,i*.1));
+try{lvmax=Math.max(lvmax,lv+2);localStorage.setItem('blk-lv',lvmax)}catch(e){}
+$('otitle').textContent='Рівень пройдено!';$('final').textContent=score;$('omsg').textContent='';$('lb2').hidden=true;$('rm').hidden=true;$('again').hidden=false;$('nx').hidden=lv>=LV.length-1;$('over').hidden=false}
+$('nx').onclick=()=>{lv++;start()};
+$('lvx').onclick=()=>{$('lv').hidden=true;menu()};
+$('rm').onclick=()=>{if(!room||!room.ended)return;$('rm').hidden=true;$('omsg').textContent='Чекаємо, поки друг погодиться на реванш…';api('rooms/'+room.code+'/rq/'+room.role,'PUT',room.rd+1).catch(()=>{})};
 g=Array.from({length:N},()=>Array(N).fill(0));tray=[];drawBoard();drawHud();menu();
 </script></body></html>
