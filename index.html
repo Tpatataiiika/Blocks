@@ -62,6 +62,8 @@ header b{font-size:clamp(30px,6vh,50px);line-height:1;font-weight:800;font-varia
 <script>
 /* Адреса бази Firebase для рекордів і дуелі. Встав її між лапками, наприклад https://назва-default-rtdb.firebaseio.com */
 const DBU='https://blocks-4a3fc-default-rtdb.europe-west1.firebasedatabase.app';
+/* Ключ Web API з Firebase (Project settings). Потрібен для захисту: анонімний вхід. */
+const APIKEY='AIzaSyD8WOuu7GKwPBfon1rqxJXBZ_sUdOiv0QI';
 let R=Math.random;
 const N=8,STONE='#7b8794';
 const TH=[{n:'Захід',c:['#e4572e','#f3a712','#29a3a3','#5b7cfa','#b05bd1']},{n:'Океан',c:['#0ea5a4','#38bdf8','#6366f1','#34d399','#f0abfc']},{n:'Неон',c:['#ff2e93','#ffe600','#00f5d4','#9b5cff','#ff7a00']}];
@@ -136,14 +138,19 @@ $('hint').onclick=hint;$('undo').onclick=undo;
 $('theme').onclick=()=>{th=(th+1)%TH.length;try{localStorage.setItem('blk-th',th)}catch(e){}if(drag)return;drawBoard();drawTray();drawHud()};
 $('snd').onclick=()=>{mute=!mute;drawHud()};
 /* онлайн: рекорди та дуель */
-const PID=(()=>{let p;try{p=localStorage.getItem('blk-pid');if(!p){p=Math.random().toString(36).slice(2,10);localStorage.setItem('blk-pid',p)}}catch(e){}return p||'a'+Math.random().toString(36).slice(2,8)})();
+let PID=(()=>{let p;try{p=localStorage.getItem('blk-pid');if(!p){p=Math.random().toString(36).slice(2,10);localStorage.setItem('blk-pid',p)}}catch(e){}return p||'a'+Math.random().toString(36).slice(2,8)})();
 let room=null;
 try{$('nm').value=localStorage.getItem('blk-name')||''}catch(e){}
 $('nm').oninput=()=>{try{localStorage.setItem('blk-name',$('nm').value)}catch(e){}};
 const nm=()=>$('nm').value.trim()||'Гравець';
-const api=async(p,m='GET',b)=>{if(!DBU)throw 0;const r=await fetch(DBU.replace(/\/$/,'')+'/'+p+'.json',{method:m,body:b===undefined?undefined:JSON.stringify(b)});if(!r.ok)throw 0;return r.json()};
+let AU=null;
+async function auth(){if(AU&&AU.exp>Date.now()+60000)return AU;let s=null,d;try{s=JSON.parse(localStorage.getItem('blk-au'))}catch(e){}
+if(s&&s.rt){const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+APIKEY,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(s.rt)});if(r.ok){d=await r.json();AU={uid:d.user_id,tok:d.id_token,rt:d.refresh_token,exp:Date.now()+d.expires_in*1000}}}
+if(!AU){const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+APIKEY,{method:'POST',headers:{'Content-Type':'application/json'},body:'{"returnSecureToken":true}'});if(!r.ok)throw 0;d=await r.json();AU={uid:d.localId,tok:d.idToken,rt:d.refreshToken,exp:Date.now()+d.expiresIn*1000}}
+try{localStorage.setItem('blk-au',JSON.stringify({rt:AU.rt}))}catch(e){}PID=AU.uid;return AU}
+const api=async(p,m='GET',b)=>{if(!DBU)throw 0;const t=APIKEY?(await auth()).tok:'';const r=await fetch(DBU.replace(/\/$/,'')+'/'+p+'.json'+(t?'?auth='+t:''),{method:m,body:b===undefined?undefined:JSON.stringify(b)});if(!r.ok)throw 0;return r.json()};
 function mulberry32(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-async function submit(){if(!DBU||!score)return;try{const p='lb/'+cfg.d+'/'+PID,o=await api(p);if(!o||score>o.s)await api(p,'PUT',{n:nm(),s:score})}catch(e){}}
+async function submit(){if(!DBU||!score)return;try{if(APIKEY)await auth();const p='lb/'+cfg.d+'/'+PID,o=await api(p);if(!o||score>o.s)await api(p,'PUT',{n:nm(),s:score})}catch(e){}}
 async function showLb(d){$('lb').hidden=false;$('menu').hidden=true;[...$('lbt').children].forEach(b=>b.classList.toggle('on',b.dataset.v===d));const L=$('lbl');L.textContent=DBU?'Завантаження…':'Таблицю ще не налаштовано.';if(!DBU)return;
 try{const o=await api('lb/'+d)||{};const a=Object.entries(o).map(([k,v])=>({k,n:String(v.n),s:+v.s||0})).sort((x,y)=>y.s-x.s).slice(0,10);L.textContent='';if(!a.length)L.textContent='Поки порожньо. Стань першим!';
 a.forEach((e,i)=>{const r=document.createElement('div'),x=document.createElement('span'),y=document.createElement('span');if(e.k===PID)r.style.fontWeight='800';x.textContent=(i+1)+'. '+e.n;y.textContent=e.s;r.append(x,y);L.appendChild(r)})}catch(e){L.textContent='Немає зв’язку з таблицею.'}}
